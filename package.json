@@ -1,0 +1,26 @@
+{
+  "name": "pico-jwt",
+  "version": "0.1.0",
+  "description": "A pico size JWT library",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ldarren/pico-jwt.git"
+  },
+  "keywords": [
+    "pico",
+    "jwt"
+  ],
+  "author": "Darren Liew",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ldarren/pico-jwt/issues"
+  },
+  "homepage": "https://github.com/ldarren/pico-jwt#readme",
+  "devDependencies": {
+    "pico-common": "^0.8.7"
+  }
+}
