@@ -20,8 +20,11 @@ ensure('create JWT with HS256', cb => {
 ensure('verify JWT with HS256', cb => {
 	cb(null, hsJwt.verify(hsJwt.create(payload)))
 })
+ensure('read header from JWT', cb => {
+	cb(null, 'JWT' === hsJwt.header(hsJwt.create(payload)).typ)
+})
 ensure('read payload from JWT', cb => {
-	cb(null, payload.hello === hsJwt.read(hsJwt.create(payload)).hello)
+	cb(null, payload.hello === hsJwt.payload(hsJwt.create(payload)).hello)
 })
 
 // wait for 
