@@ -4,12 +4,13 @@ const crypto = require('crypto')
 
 const SEP = '.'
 const TYP = 'JWT'
+const FMT = 'base64'
 
 const debug = process.env.DEBUG ? console.error : () => {}
 
 function readKey(key, cb){
 	if (key && path.isAbsolute(key)) {
-		return fs.readFile(key, 'utf8', cb)
+		return fs.readFile(key, cb)
 	}
 	cb(null, key)
 }
@@ -34,7 +35,7 @@ function algoMap(alg) {
 }
 
 function base64(str){
-  return new Buffer(str).toString('base64')
+  return new Buffer(str).toString(FMT)
 }
 
 function urlEscape(b64) {
@@ -56,13 +57,13 @@ function sign(segments, alg, secret){
 		c.write(SEP)
 		c.write(segments[1])
 		c.end()
-		return urlEscape(c.sign(secret, 'base64'))
+		return urlEscape(c.sign(secret, FMT))
 	}else{
 		const c = crypto.createHmac(algName, secret)
 		c.update(segments[0])
 		c.update(SEP)
 		c.update(segments[1])
-		return urlEscape(c.digest('base64'))
+		return urlEscape(c.digest(FMT))
 	}
 }
 
@@ -72,7 +73,7 @@ function encode(obj){
 
 function decode(b64){
 	try {
-		return JSON.parse(Buffer.from(b64, 'base64'))
+		return JSON.parse(Buffer.from(b64, FMT))
 	} catch (exp) {
 		return debug(exp)
 	}
@@ -129,13 +130,13 @@ JWT.prototype = {
 			c.write(cut(jwt, 0, 2))
 			c.end()
 
-			return c.verify(this.publicKey, Buffer.from(cut(jwt, 2), 'base64'))
+			return c.verify(this.publicKey, Buffer.from(cut(jwt, 2), FMT))
 		} else {
 			const c = crypto.createHmac(algo, this.privateKey)
 
 			c.update(cut(jwt, 0, 2))
 
-			return urlEscape(c.digest('base64')) === cut(jwt, 2)
+			return urlEscape(c.digest(FMT)) === cut(jwt, 2)
 		}
 	}
 }

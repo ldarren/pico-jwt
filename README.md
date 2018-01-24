@@ -2,7 +2,7 @@
 A pico size JWT module
 
 ## Selling Points
-- Small footprint (141 LOC)
+- Small footprint (143 LOC uncompressed)
 - Simple and easy
 - Zero dependencies
 
@@ -43,7 +43,7 @@ const header = jwt.header(token)
 // get payload of jwt
 const payload = jwt.payload(token)
 
-// verify jwy
+// verify jwt
 if (!jwt.verify(token)) {
 	console.log('failed')
 }
