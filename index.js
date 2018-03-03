@@ -9,7 +9,7 @@ const FMT = 'base64'
 const debug = process.env.DEBUG ? console.error : () => {}
 
 function readKey(key, cb){
-	if (key && path.isAbsolute(key)) {
+	if (key && key.charAt && path.isAbsolute(key)) {
 		return fs.readFile(key, cb)
 	}
 	cb(null, key)
