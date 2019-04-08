@@ -38,10 +38,10 @@ const token = jwt.create({
 })
 
 // get header of jwt
-const header = jwt.header(token)
+const header = jwt.header(token) // or pJWT.prototype.header(token)
 
 // get payload of jwt
-const payload = jwt.payload(token)
+const payload = jwt.payload(token) // or pJWT.prototype.payload(token)
 
 // verify jwt
 if (!jwt.verify(token)) {
