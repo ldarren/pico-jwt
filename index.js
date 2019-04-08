@@ -35,23 +35,23 @@ function algoMap(alg) {
 }
 
 function base64(str){
-  return new Buffer(str).toString(FMT)
+	return new Buffer(str).toString(FMT)
 }
 
 function urlEscape(b64) {
-  return b64
-    .replace(/\+/g, '-')
-    .replace(/\//g, '_')
-    .replace(/=/g, '');
+	return b64
+		.replace(/\+/g, '-')
+		.replace(/\//g, '_')
+		.replace(/=/g, '')
 }
 
-function urlUnescape(b64) {
-    return b64.replace(/\-/g, '+').replace(/_/g, '/') + new Array(5 - b64.length % 4).join('=')
+function _urlUnescape(b64) {
+	return b64.replace(/-/g, '+').replace(/_/g, '/') + new Array(5 - b64.length % 4).join('=')
 }
 
 function sign(segments, alg, secret){
-    const algName = algoMap(alg)
-    if ('R' === alg.charAt(0)){
+	const algName = algoMap(alg)
+	if ('R' === alg.charAt(0)){
 		const c = crypto.createSign(algName)
 		c.write(segments[0])
 		c.write(SEP)
@@ -120,7 +120,7 @@ JWT.prototype = {
 		const header = this.header(jwt)
 		if (!header) return false
 
-		if (TYP !== header.typ) return debug('wrong type', header.typ), false
+		if (header.typ && TYP !== header.typ) return debug('wrong type', header.typ), false
 		const algo = algoMap(header.alg)
 		if (!algo) return debug('algo not supported', header.alg), false
 

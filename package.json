@@ -1,10 +1,12 @@
 {
   "name": "pico-jwt",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "A pico size JWT library",
   "main": "index.js",
   "scripts": {
-    "test": "node test.js"
+    "test": "DEBUG=1 node test.js",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
   },
   "repository": {
     "type": "git",
@@ -21,6 +23,6 @@
   },
   "homepage": "https://github.com/ldarren/pico-jwt#readme",
   "devDependencies": {
-    "pico-common": "^0.8.7"
+    "pico-common": "^0.10.17"
   }
 }
