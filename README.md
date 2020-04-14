@@ -35,7 +35,7 @@ const jwt = new pJWT('HS256', 'secretKey')
 const token = jwt.create({
 	iss: 'pico',
 	hello: 'world'
-})
+}, {custom: 'id'})
 
 // get header of jwt
 const header = jwt.header(token) // or pJWT.prototype.header(token)

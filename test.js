@@ -21,7 +21,9 @@ test('verify JWT with HS256', cb => {
 	cb(null, hsJwt.verify(hsJwt.create(payload)))
 })
 test('read header from JWT', cb => {
-	cb(null, 'JWT' === JWT.prototype.header(hsJwt.create(payload)).typ)
+	const jwt = hsJwt.create(payload, {kid: 'ab1'})
+	const h = JWT.prototype.header(jwt)
+	cb(null, 'JWT' === h.typ && 'ab1' === h.kid)
 })
 test('read payload from JWT', cb => {
 	cb(null, payload.hello === JWT.prototype.payload(hsJwt.create(payload)).hello)

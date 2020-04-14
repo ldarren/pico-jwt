@@ -35,7 +35,7 @@ function algoMap(alg) {
 }
 
 function base64(str){
-	return new Buffer(str).toString(FMT)
+	return new Buffer.from(str).toString(FMT)
 }
 
 function urlEscape(b64) {
@@ -97,16 +97,16 @@ JWT.prototype = {
 			if (2 === ++i) cb()
 		})
 	},
-	create(payload, algo){
-		const header = {
+	create(payload, header = {}){
+		const h = Object.assign({
 			typ: TYP,
-			alg: algo || this.algo
-		}
-		const header64 = encode(header)
+			alg: this.algo
+		}, header)
+		const header64 = encode(h)
 		const body64 = encode(payload)
 
 		const segments = [header64, body64]
-		segments.push(sign(segments, header.alg, this.privateKey))
+		segments.push(sign(segments, h.alg, this.privateKey))
 
 		return segments.join(SEP)
 	},

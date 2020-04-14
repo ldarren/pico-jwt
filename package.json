@@ -1,6 +1,6 @@
 {
   "name": "pico-jwt",
-  "version": "0.2.3",
+  "version": "0.3.0",
   "description": "A pico size JWT library",
   "main": "index.js",
   "scripts": {
@@ -23,6 +23,6 @@
   },
   "homepage": "https://github.com/ldarren/pico-jwt#readme",
   "devDependencies": {
-    "pico-common": "^0.10.17"
+    "pico-common": "^0.12.2"
   }
 }
