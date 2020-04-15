@@ -1,6 +1,7 @@
 const fs = require('fs')
 const path = require('path')
 const crypto = require('crypto')
+const ecdsa = require('ecdsa-sig-formatter')
 
 const SEP = '.'
 const TYP = 'JWT'
@@ -51,34 +52,73 @@ function _urlUnescape(b64) {
 	return b64.replace(/-/g, '+').replace(/_/g, '/') + new Array(5 - b64.length % 4).join('=')
 }
 
-function sign(segments, alg, secret){
-	const algName = algoMap(alg)
+function sign(segments, alg, key){
+	const algo = algoMap(alg)
 	let c
 	switch(alg.charAt(0)){
 	case 'H':
-		c = crypto.createHmac(algName, secret)
+		c = crypto.createHmac(algo, key)
 		c.update(segments[0])
 		c.update(SEP)
 		c.update(segments[1])
 		return urlEscape(c.digest(FMT))
 	case 'P':
-		c = crypto.createSign(algName)
+		c = crypto.createSign(algo)
 		c.write(segments[0])
 		c.write(SEP)
 		c.write(segments[1])
 		c.end()
 		return urlEscape(c.sign({
-			key: secret,
+			key,
 			padding: crypto.constants.RSA_PKCS1_PSS_PADDING,
 			saltLength: crypto.constants.RSA_PSS_SALTLEN_DIGEST
 		}, FMT))
-	default:
-		c = crypto.createSign(algName)
+	case 'E':
+		c = crypto.createSign(algo)
 		c.write(segments[0])
 		c.write(SEP)
 		c.write(segments[1])
 		c.end()
-		return urlEscape(c.sign(secret, FMT))
+		return ecdsa.derToJose(urlEscape(c.sign(key, FMT)), alg)
+	default:
+		c = crypto.createSign(algo)
+		c.write(segments[0])
+		c.write(SEP)
+		c.write(segments[1])
+		c.end()
+		return urlEscape(c.sign(key, FMT))
+	}
+}
+
+function verify(headpay, sig, alg, key){
+	const algo = algoMap(alg)
+	if (!algo) return debug('algo not supported', alg), false
+
+	let c
+	switch(alg.charAt(0)){
+	case 'H':
+		c = crypto.createHmac(algo, key)
+		c.update(headpay)
+
+		return urlEscape(c.digest(FMT)) === sig
+	case 'P':
+		c = crypto.createVerify(algo)
+		c.write(headpay)
+		c.end()
+
+		return c.verify({
+			key,
+			padding: crypto.constants.RSA_PKCS1_PSS_PADDING,
+			saltLength: crypto.constants.RSA_PSS_SALTLEN_DIGEST
+		}, Buffer.from(sig, FMT))
+	case 'E':
+		sig = ecdsa.joseToDer(sig, alg)
+		// fall through
+	default:
+		c = crypto.createVerify(algo)
+		c.write(headpay)
+		c.end()
+		return c.verify(key, Buffer.from(sig, FMT))
 	}
 }
 
@@ -133,36 +173,11 @@ JWT.prototype = {
 	},
 	verify(jwt){
 		const header = this.header(jwt)
-		if (!header) return false
+		if (!header) return debug('no header'), false
 
 		if (header.typ && TYP !== header.typ) return debug('wrong type', header.typ), false
-		const algo = algoMap(header.alg)
-		if (!algo) return debug('algo not supported', header.alg), false
-
-		let c
-		switch(header.alg.charAt(0)){
-		case 'H':
-			c = crypto.createHmac(algo, this.privateKey)
-			c.update(cut(jwt, 0, 2))
-
-			return urlEscape(c.digest(FMT)) === cut(jwt, 2)
-		case 'P':
-			c = crypto.createVerify(algo)
-			c.write(cut(jwt, 0, 2))
-			c.end()
-
-			return c.verify({
-				key: this.publicKey,
-				padding: crypto.constants.RSA_PKCS1_PSS_PADDING,
-				saltLength: crypto.constants.RSA_PSS_SALTLEN_DIGEST
-			}, Buffer.from(cut(jwt, 2), FMT))
-		default:
-			c = crypto.createVerify(algo)
-			c.write(cut(jwt, 0, 2))
-			c.end()
-
-			return c.verify(this.publicKey, Buffer.from(cut(jwt, 2), FMT))
-		}
+		
+		return verify(cut(jwt, 0, 2), cut(jwt, 2), header.alg, this.publicKey || this.privateKey)
 	}
 }
 
