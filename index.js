@@ -29,8 +29,8 @@ function cut(jwt, start, end){
 
 function algoMap(alg) {
 	switch (alg.substr(0, 2)) {
-	case 'ES':
 	case 'HS': return 'SHA' + alg.substr(2)
+	case 'ES':
 	case 'PS':
 	case 'RS': return 'RSA-SHA' + alg.substr(2)
 	}
