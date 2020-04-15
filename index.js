@@ -29,13 +29,15 @@ function cut(jwt, start, end){
 
 function algoMap(alg) {
 	switch (alg.substr(0, 2)) {
+	case 'ES':
 	case 'HS': return 'SHA' + alg.substr(2)
+	case 'PS':
 	case 'RS': return 'RSA-SHA' + alg.substr(2)
 	}
 }
 
 function base64(str){
-	return new Buffer.from(str).toString(FMT)
+	return Buffer.from(str).toString(FMT)
 }
 
 function urlEscape(b64) {
@@ -51,19 +53,32 @@ function _urlUnescape(b64) {
 
 function sign(segments, alg, secret){
 	const algName = algoMap(alg)
-	if ('R' === alg.charAt(0)){
-		const c = crypto.createSign(algName)
+	let c
+	switch(alg.charAt(0)){
+	case 'H':
+		c = crypto.createHmac(algName, secret)
+		c.update(segments[0])
+		c.update(SEP)
+		c.update(segments[1])
+		return urlEscape(c.digest(FMT))
+	case 'P':
+		c = crypto.createSign(algName)
+		c.write(segments[0])
+		c.write(SEP)
+		c.write(segments[1])
+		c.end()
+		return urlEscape(c.sign({
+			key: secret,
+			padding: crypto.constants.RSA_PKCS1_PSS_PADDING,
+			saltLength: crypto.constants.RSA_PSS_SALTLEN_DIGEST
+		}, FMT))
+	default:
+		c = crypto.createSign(algName)
 		c.write(segments[0])
 		c.write(SEP)
 		c.write(segments[1])
 		c.end()
 		return urlEscape(c.sign(secret, FMT))
-	}else{
-		const c = crypto.createHmac(algName, secret)
-		c.update(segments[0])
-		c.update(SEP)
-		c.update(segments[1])
-		return urlEscape(c.digest(FMT))
 	}
 }
 
@@ -124,19 +139,29 @@ JWT.prototype = {
 		const algo = algoMap(header.alg)
 		if (!algo) return debug('algo not supported', header.alg), false
 
-		if ('R' === header.alg.charAt(0)){
-			const c = crypto.createVerify(algo)
+		let c
+		switch(header.alg.charAt(0)){
+		case 'H':
+			c = crypto.createHmac(algo, this.privateKey)
+			c.update(cut(jwt, 0, 2))
 
+			return urlEscape(c.digest(FMT)) === cut(jwt, 2)
+		case 'P':
+			c = crypto.createVerify(algo)
+			c.write(cut(jwt, 0, 2))
+			c.end()
+
+			return c.verify({
+				key: this.publicKey,
+				padding: crypto.constants.RSA_PKCS1_PSS_PADDING,
+				saltLength: crypto.constants.RSA_PSS_SALTLEN_DIGEST
+			}, Buffer.from(cut(jwt, 2), FMT))
+		default:
+			c = crypto.createVerify(algo)
 			c.write(cut(jwt, 0, 2))
 			c.end()
 
 			return c.verify(this.publicKey, Buffer.from(cut(jwt, 2), FMT))
-		} else {
-			const c = crypto.createHmac(algo, this.privateKey)
-
-			c.update(cut(jwt, 0, 2))
-
-			return urlEscape(c.digest(FMT)) === cut(jwt, 2)
 		}
 	}
 }
