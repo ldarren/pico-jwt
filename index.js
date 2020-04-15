@@ -176,7 +176,7 @@ JWT.prototype = {
 		if (!header) return debug('no header'), false
 
 		if (header.typ && TYP !== header.typ) return debug('wrong type', header.typ), false
-		
+
 		return verify(cut(jwt, 0, 2), cut(jwt, 2), header.alg, this.publicKey || this.privateKey)
 	}
 }
