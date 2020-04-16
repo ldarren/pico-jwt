@@ -1,5 +1,5 @@
 # pico-jwt
-A pico size JWT module
+A pico-sized JWT module
 
 ## Why?
 - Small footprint (184 LOC uncompressed)
@@ -10,7 +10,7 @@ A pico size JWT module
 `npm i pico-jwt`
 
 ## Algorithms
-This library supports most of the cryptographic algorithms for JWK:
+This library supports most of the cryptographic algorithms for JWT:
 
 alg Parameter Value | Digital Signature or MAC Algorithm
 ----------------|----------------------------

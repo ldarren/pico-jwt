@@ -1,7 +1,7 @@
 {
   "name": "pico-jwt",
   "version": "0.3.3",
-  "description": "A pico size JWT library",
+  "description": "A pico-sized JWT library",
   "main": "index.js",
   "scripts": {
     "test": "DEBUG=1 node test.js",
