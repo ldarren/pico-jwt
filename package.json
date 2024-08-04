@@ -1,8 +1,10 @@
 {
   "name": "pico-jwt",
-  "version": "0.3.3",
+  "version": "0.4.0",
   "description": "A pico-sized JWT library",
+  "type": "commonjs",
   "main": "index.js",
+  "module": "index.mjs",
   "scripts": {
     "test": "DEBUG=1 node test.js",
     "lint": "eslint .",
