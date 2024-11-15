@@ -30,12 +30,23 @@ ES512 | ECDSA using P-521 curve and SHA-512 hash algorithm
 Please note that PSXXX only works on Node 6.12+ (excluding 7.x).
 
 ## Test
-`npm test`
+
+### Feature Test
+```bash
+npm test
+```
+
+### ESM Test
+```bash
+node test.mjs
+```
 
 ## Example
 ```javascript
 // import module
-const pJWT = require('pico-jwt')
+import pJWT from 'pico-jwt'
+// supported commonjs require as well
+// const pJWT = require('pico-jwt')
 
 // instantiate the module
 const jwt = new pJWT('HS256', 'secretKey')
